@@ -1,0 +1,4 @@
+// Login to mongodb sandbox
+mongo <<Your mongodb url from Heroku>>
+// Find a user based on email address
+db.users.find({'emails.address': "youremail@gmail.com"})
