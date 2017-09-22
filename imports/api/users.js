@@ -3,7 +3,7 @@ import SimpleSchema from 'simpl-schema';
 import { Accounts } from 'meteor/accounts-base';
 import _ from 'lodash';
 
-Accounts.validateNewUser((user) => {
+export const validateNewUser = (user) => {
   const email = user.emails[0].address;
 
   try {
@@ -18,29 +18,33 @@ Accounts.validateNewUser((user) => {
   }
 
   return true;
-});
+};
 
-Accounts.onCreateUser((options, user) => {
-  // Currently only support creating an account through either facebook or google
-  if (!user.services.facebook && !user.services.google) {
-    return user;
-  }
+if (Meteor.isServer) {
+  Accounts.validateNewUser(validateNewUser);
 
-  const newUser = Object.assign({}, user);
-  const facebookName = _.get(newUser, 'services.facebook.name');
-  const facebookEmail = _.get(newUser, 'services.facebook.email');
-  const googleName = _.get(newUser, 'services.google.name');
-  const googleEmail = _.get(newUser, 'services.google.email');
+  Accounts.onCreateUser((options, user) => {
+    // Currently only support creating an account through either facebook or google
+    if (!user.services.facebook && !user.services.google) {
+      return user;
+    }
 
-  newUser.username = facebookName || googleName;
+    const newUser = Object.assign({}, user);
+    const facebookName = _.get(newUser, 'services.facebook.name');
+    const facebookEmail = _.get(newUser, 'services.facebook.email');
+    const googleName = _.get(newUser, 'services.google.name');
+    const googleEmail = _.get(newUser, 'services.google.email');
 
-  newUser.emails = [];
-  if (facebookEmail) {
-    newUser.emails.push({ address: facebookEmail });
-  }
-  if (googleEmail) {
-    newUser.emails.push({ address: googleEmail });
-  }
+    newUser.username = facebookName || googleName;
 
-  return newUser;
-});
+    newUser.emails = [];
+    if (facebookEmail) {
+      newUser.emails.push({ address: facebookEmail });
+    }
+    if (googleEmail) {
+      newUser.emails.push({ address: googleEmail });
+    }
+
+    return newUser;
+  });
+}

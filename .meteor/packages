@@ -24,3 +24,4 @@ accounts-facebook@1.2.1
 service-configuration@1.0.11
 pauldowman:dotenv
 accounts-google@1.2.0
+practicalmeteor:mocha
