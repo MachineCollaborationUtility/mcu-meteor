@@ -25,3 +25,4 @@ service-configuration@1.0.11
 pauldowman:dotenv
 accounts-google@1.2.0
 practicalmeteor:mocha
+react-meteor-data
