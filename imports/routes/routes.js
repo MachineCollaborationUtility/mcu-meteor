@@ -7,8 +7,10 @@ import PropTypes from 'prop-types';
 
 import Login from '../ui/Login';
 import Dashboard from '../ui/Dashboard';
+import Files from '../ui/Files/Files';
 import Signup from '../ui/Signup';
 import NotFound from '../ui/NotFound';
+
 import AuthenticatedRoute from './AuthenticatedRoute';
 import NewUserOnlyRoute from './NewUserOnlyRoute';
 
@@ -19,7 +21,8 @@ const Routes = (props) => {
       <Switch>
         <NewUserOnlyRoute exact path="/" component={Login} {...props} />
         <NewUserOnlyRoute exact path="/signup" component={Signup} {...props} />
-        <AuthenticatedRoute exact path="/dashboard" component={Dashboard} {...props} />
+        <AuthenticatedRoute path="/dashboard" component={Dashboard} {...props} />
+        <AuthenticatedRoute exact path="/files" component={Files} {...props} />
         <Route component={NotFound} />
       </Switch>
     </Router>
