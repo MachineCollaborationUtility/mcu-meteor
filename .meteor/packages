@@ -26,3 +26,4 @@ pauldowman:dotenv
 accounts-google@1.2.0
 practicalmeteor:mocha
 react-meteor-data
+ostrio:files

@@ -3,7 +3,11 @@ import { WebApp } from 'meteor/webapp';
 // import { ServiceConfiguration } from "meteor/service-configuration";
 
 import '../imports/api/users';
+import '../imports/api/bots';
+import '../imports/api/files';
 import '../imports/startup/simple-schema-configuration';
+
+import UsbDiscovery from '../imports/server/bots/discovery/usb';
 
 // ServiceConfiguration.configurations.remove({
 //   service: 'facebook',
@@ -25,4 +29,7 @@ import '../imports/startup/simple-schema-configuration';
 //   secret: process.env.GOOGLE_SECRET,
 // });
 
-Meteor.startup(() => {});
+Meteor.startup(() => {
+  UsbDiscovery.initialize();
+  // Meteor.call('bots.insert', 'http://kloner3d.ads.autodesk.com');
+});
