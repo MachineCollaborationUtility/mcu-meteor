@@ -14,7 +14,6 @@ let SerialPort;
 if (process.env.NODE_ENV !== 'test') {
   SerialPort = require('serialport'); // NEEDS LIBUSB Binaries to work
 }
-const winston = require('winston');
 const path = require('path');
 
 /**

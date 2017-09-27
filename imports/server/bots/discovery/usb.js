@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import bluebird from 'bluebird';
 import * as presets from '../../../botPresets/**/index.js';
-import { Bots } from '../../../api/bots';
+import { Bots, BotsState } from '../../../api/bots';
 
 let usb;
 let SerialPort;

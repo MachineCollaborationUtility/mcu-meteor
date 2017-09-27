@@ -1,3 +1,1 @@
-# Boilerplate Meteor Project
-
-This includes react, etc...
+# MCU Meteor Project

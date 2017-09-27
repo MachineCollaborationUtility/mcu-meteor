@@ -8,7 +8,6 @@ import '../imports/api/files';
 import '../imports/startup/simple-schema-configuration';
 
 import UsbDiscovery from '../imports/server/bots/discovery/usb';
-
 // ServiceConfiguration.configurations.remove({
 //   service: 'facebook',
 // });
@@ -31,5 +30,4 @@ import UsbDiscovery from '../imports/server/bots/discovery/usb';
 
 Meteor.startup(() => {
   UsbDiscovery.initialize();
-  // Meteor.call('bots.insert', 'http://kloner3d.ads.autodesk.com');
 });

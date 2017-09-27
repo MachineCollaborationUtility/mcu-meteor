@@ -1,24 +1,23 @@
+/* global botList */
 import { Meteor } from 'meteor/meteor';
+
+let BotState;
+if (Meteor.isServer) {
+  BotState = require('../server/bots/BotState');
+}
+
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 import moment from 'moment';
+import bluebird from 'bluebird';
+
 import * as presets from '../botPresets/**/index.js';
 
 import botFsmDefinitions from '../stateMachines/bots';
 import jobFsmDefinitions from '../stateMachines/jobs';
 
 export const Bots = new Mongo.Collection('bots');
-
-if (Meteor.isServer) {
-  const bots = Bots.find().fetch();
-  bots.forEach((bot) => {
-    Bots.update({ _id: bot._id }, { $set: { state: 'uninitialized' } }, (error, result) => {});
-  });
-
-  Meteor.publish('bots', function () {
-    return Bots.find({ $or: [{ userId: this.userId }, { userId: null }] });
-  });
-}
+export const BotList = {};
 
 Meteor.methods({
   'bots.insert': function ({
@@ -63,6 +62,7 @@ Meteor.methods({
         userId: this.userId || null,
         createdAt: moment().valueOf(),
         updatedAt: moment().valueOf(),
+        status: null,
       },
       (error, response) => {
         if (error) {
@@ -101,11 +101,9 @@ Meteor.methods({
     }
 
     if (typeof preset.commands[command] !== 'function') {
-      console.log(preset.commands);
       throw new Meteor.Error(`Command "${command}" not found`);
     }
 
-    console.log('here we go', command, botId, args);
     preset.commands[command](botId, args);
   },
   'bots.updateState': function (botId, action) {
@@ -126,7 +124,7 @@ Meteor.methods({
     });
 
     if (!valid) {
-      throw new Meteor.Error('Invalid state change');
+      throw new Meteor.Error(`Invalid state change "${action}" from state "${bot.state}"`);
     }
 
     Bots.update({ _id: bot._id }, { $set: { state: newState } }, (error, result) => {
@@ -135,4 +133,46 @@ Meteor.methods({
       }
     });
   },
+  'bots.updateStatus': function (botId, status) {
+    const bot = Bots.findOne(botId);
+
+    // Validate status?
+    Bots.update({ _id: bot._id }, { $set: { status } }, (error, result) => {
+      if (error) {
+        return error.reason;
+      }
+    });
+  },
+  'bots.initialize': async function () {
+    try {
+      const bots = Bots.find().fetch();
+
+      bots.forEach((bot) => {
+        Bots.update({ _id: bot._id }, { $set: { state: 'uninitialized' } }, (error, result) => {});
+      });
+
+      // HACK! Should run new bot state after all bots set to uninitialized
+      Meteor.setTimeout(() => {
+        bots.forEach((bot) => {
+          try {
+            BotList[bot._id] = new BotState(bot);
+          } catch (ex) {
+            throw new Meteor.Error('BotPreset Error', ex);
+          }
+        });
+      }, 1000);
+    } catch (ex) {
+      throw new Meteor.Error('Initialization error', ex);
+    }
+  },
 });
+
+if (Meteor.isServer) {
+  Meteor.call('bots.initialize');
+
+  Meteor.publish('bots', function () {
+    return Bots.find({ $or: [{ userId: this.userId }, { userId: null }] });
+  });
+
+  // Populate global variable with bots with their id as the key
+}

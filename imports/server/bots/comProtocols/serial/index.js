@@ -12,10 +12,13 @@
  *         inBaud         - baud rate at which to connect
  *         inOpenPrimeStr - function a string of commands to send to prime the conn
  */
+const _ = require('underscore');
 
 const SerialConnection = require('./connection');
 
-const SerialCommandExecutor = function (app, inComName, inBaud, inOpenPrimeStr, bot) {
+const SerialCommandExecutor = function ({ settings, info }) {
+  this.settings = settings;
+  this.info = info;
   this.mComName = inComName;
   this.mBaud = inBaud;
   this.mOpenPrimeStr = inOpenPrimeStr;
@@ -24,6 +27,25 @@ const SerialCommandExecutor = function (app, inComName, inBaud, inOpenPrimeStr, 
   this.app = app;
   this.io = app.io;
   this.bot = bot;
+};
+
+/**
+ * validator()
+ *
+ * Confirms if a reply contains 'ok' as its last line.  Parses out DOS newlines.
+ *
+ * Args:   reply - The reply from a bot after sending a command
+ * Return: true if the last line was 'ok'
+ */
+SerialCommandExecutor.validator = function (command, reply) {
+  const lines = reply.toString().split('\n');
+  let ok;
+  try {
+    ok = _.last(lines).indexOf('ok') !== -1;
+  } catch (ex) {
+    logger.error('Bot validate serial reply error', reply, ex);
+  }
+  return ok;
 };
 
 /**

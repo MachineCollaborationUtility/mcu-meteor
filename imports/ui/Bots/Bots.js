@@ -4,6 +4,7 @@ import { Tracker } from 'meteor/tracker';
 import { Session } from 'meteor/session';
 import FlipMove from 'react-flip-move';
 import moment from 'moment';
+import autobind from 'react-autobind';
 
 import { Bots as BotAPI } from '../../api/bots';
 
@@ -17,6 +18,8 @@ export default class Bots extends React.Component {
       bots: [],
       lastUpdated: moment().valueOf(),
     };
+
+    autobind(this);
   }
 
   componentDidMount() {
@@ -58,9 +61,18 @@ export default class Bots extends React.Component {
     return this.state.bots.map(bot => <p key={bot._id}>{JSON.stringify(bot)}</p>);
   }
 
+  createVirtualBot() {
+    Meteor.call('bots.insert', { model: 'Virtual' }, (error) => {
+      if (error) {
+        throw Meteor.Error('Create Virtual Bot error', error);
+      }
+    });
+  }
+
   render() {
     return (
       <div>
+        <button onClick={this.createVirtualBot}>Create Bot</button>
         <FlipMove maintainContainerHeight>{this.renderBots()}</FlipMove>
       </div>
     );
