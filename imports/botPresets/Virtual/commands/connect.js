@@ -1,24 +1,25 @@
-/* global logger */
-const delay = Promise.delay;
+import { Bots, BotList } from '../../../api/bots';
+import { Meteor } from 'meteor/meteor';
 
-module.exports = function connect(self) {
+module.exports = function connect(botId, args) {
   try {
-    if (self.fsm.current !== 'ready') {
+    const bot = Bots.findOne(botId);
+    if (bot.state !== 'ready') {
       throw new Error(`Cannot connect from state "${self.fsm.current}"`);
     }
-    self.fsm.connect();
 
-    self.queue.queueCommands({
-      open: true,
-      postCallback: async () => {
-        await delay(100); // Fake connecting delay
-        self.commands.toggleUpdater(self, { update: true });
-        self.fsm.connectDone();
-      },
+    Meteor.call('bots.updateState', botId, 'connect', (error, response) => {
+      const botState = BotList[botId];
+      botState.queue.queueCommands({
+        open: true,
+        postCallback: async () => {
+          // await delay(100); // Fake connecting delay
+          botState.presets.commands.toggleUpdater(botState, { update: true });
+          Meteor.call('bots.updateState', botId, 'connectDone', (error, response) => {});
+        },
+      });
     });
   } catch (ex) {
-    logger.error('Connect fail.', ex);
-    self.fsm.connectFail();
+    Meteor.call('bots.updateState', botId, 'connectFail', (error, response) => {});
   }
-  return self.getBot();
 };

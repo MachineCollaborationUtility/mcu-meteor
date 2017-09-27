@@ -1,6 +1,6 @@
-module.exports = function toggleUpdater(self, params) {
-  if (self.updateInterval === undefined) {
-    self.updateInterval = false;
+module.exports = function toggleUpdater(botState, params) {
+  if (botState.updateInterval === undefined) {
+    botState.updateInterval = false;
   }
 
   const update = params.update;
@@ -9,17 +9,17 @@ module.exports = function toggleUpdater(self, params) {
   }
 
   if (update) {
-    if (self.updateInterval === false) {
-      self.updateInterval = setInterval(() => {
-        self.commands.updateRoutine(self);
+    if (botState.updateInterval === false) {
+      botState.updateInterval = setInterval(() => {
+        botState.presets.commands.updateRoutine(botState);
       }, 2000);
     }
     return 'Bot update routine is on';
   }
 
-  if (self.updateInterval !== false) {
-    clearInterval(self.updateInterval);
-    self.updateInterval = false;
+  if (botState.updateInterval !== false) {
+    clearInterval(botState.updateInterval);
+    botState.updateInterval = false;
   }
 
   return 'Bot update routine is off';

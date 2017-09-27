@@ -64,11 +64,14 @@ Meteor.methods({
         updatedAt: moment().valueOf(),
         status: null,
       },
-      (error, response) => {
+      (error, botId) => {
+        // Once the new bot is created, create a matching "bot state"
         if (error) {
           // We can toss an error to the user if something fudges up.
           return error.reason;
         }
+        const bot = Bots.findOne(botId);
+        BotList[bot._id] = new BotState(bot);
       },
     );
   },

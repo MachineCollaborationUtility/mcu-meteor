@@ -8,6 +8,8 @@ import autobind from 'react-autobind';
 
 import { Bots as BotAPI } from '../../api/bots';
 
+import Bot from './Bot';
+
 export default class Bots extends React.Component {
   constructor(props) {
     super(props);
@@ -58,7 +60,7 @@ export default class Bots extends React.Component {
       );
     }
 
-    return this.state.bots.map(bot => <p key={bot._id}>{JSON.stringify(bot)}</p>);
+    return this.state.bots.map(bot => <Bot key={bot._id} {...bot} />);
   }
 
   createVirtualBot() {

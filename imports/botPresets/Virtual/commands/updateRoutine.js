@@ -1,8 +1,6 @@
-/* global logger */
-const path = require('path');
-
-const botFsmDefinitions = require('../../../stateMachines/bots');
-const jobFsmDefinitions = require('../../../stateMachines/jobs');
+import path from 'path';
+import botFsmDefinitions from '../../../stateMachines/bots';
+import jobFsmDefinitions from '../../../stateMachines/jobs';
 
 module.exports = function updateRoutine(self, params) {
   if (botFsmDefinitions.metaStates.connected.includes(self.fsm.current)) {
@@ -71,7 +69,7 @@ module.exports = function updateRoutine(self, params) {
           newPosition.e = reply.split('E:')[1].split(' ')[0];
           self.status.position = newPosition;
         } catch (ex) {
-          logger.error('Failed to set position', reply, ex);
+          console.log('Failed to set position', reply, ex);
         }
         return true;
       },
