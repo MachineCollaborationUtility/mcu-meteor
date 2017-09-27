@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import _ from 'underscore';
 
-import * as presets from '../../botPresets/**/index.js';
-import * as comProtocols from './comProtocols/**/index.js';
+import presets from '../../botPresets';
+import comProtocols from './comProtocols';
 import CommandQueue from './commandQueue';
 
 class BotState {
